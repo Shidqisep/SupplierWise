@@ -56,7 +56,7 @@
 </a>
         </nav>
 
-        {{-- Bottom nav --}}
+        <!-- {{-- Bottom nav --}}
         <div class="flex flex-col gap-sm mt-auto border-t border-outline-subtle pt-md">
             <div class="text-secondary flex items-center gap-md px-md py-sm hover:bg-surface-container-high cursor-pointer transition-all duration-200 rounded-DEFAULT">
                 <span class="material-symbols-outlined">settings</span>
@@ -66,7 +66,7 @@
                 <span class="material-symbols-outlined">help</span>
                 <span class="font-label-md text-label-md">Support</span>
             </div>
-        </div>
+        </div> -->
     </div>
 </aside>
 

@@ -124,7 +124,7 @@
             <div class="bento-grid">
                 <!-- Visual Comparison Chart -->
                 <div
-                    class="col-span-8 bg-surface-container-lowest p-lg rounded-lg border border-outline-variant shadow-[0_4px_20px_rgba(15,23,42,0.04)] space-y-md">
+                    class="col-span-8 bg-surface-container-lowest mb-8 p-lg rounded-lg border border-outline-variant shadow-[0_4px_20px_rgba(15,23,42,0.04)] space-y-md">
                     <div class="flex justify-between items-center">
                         <h4 class="font-headline-sm text-headline-sm text-on-surface">Perbandingan Visual</h4>
                     </div>
