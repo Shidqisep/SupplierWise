@@ -27,12 +27,12 @@ class CriteriaController extends Controller
         return response()->json($criteria, 201);
     }
 
-    public function show(Criteria $criteria): JsonResponse
+    public function show(Criteria $criterion): JsonResponse
     {
-        return response()->json($criteria);
+        return response()->json($criterion);
     }
 
-    public function update(Request $request, Criteria $criteria): JsonResponse
+    public function update(Request $request, Criteria $criterion): JsonResponse
     {
         $data = $request->validate([
             'criteria_name' => 'required|string|max:255',
@@ -40,14 +40,14 @@ class CriteriaController extends Controller
             'weight' => 'required|numeric|min:0',
         ]);
 
-        $criteria->update($data);
+        $criterion->update($data);
 
-        return response()->json($criteria);
+        return response()->json($criterion);
     }
 
-    public function destroy(Criteria $criteria): JsonResponse
+    public function destroy(Criteria $criterion): JsonResponse
     {
-        $criteria->delete();
+        $criterion->delete();
 
         return response()->json(null, 204);
     }

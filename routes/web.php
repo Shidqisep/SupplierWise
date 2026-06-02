@@ -2,15 +2,20 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::view('/dashboard', 'dashboard')
+    ->name('dashboard');
 
-Route::get('/app', function () {
-    return view('app');
-});
+Route::view('/suppliers', 'suppliers')
+    ->name('suppliers');
 
-Route::get('/admin', function () {
-    return view('admin');
-});
+Route::view('/criteria', 'criteria')
+    ->name('criteria');
+
+Route::view('/results', 'results')
+    ->name('results');
+
+Route::get('/suppliers/{id}/values', function ($id) {
+    return view('supplier-values', ['supplierId' => (int) $id]);
+})->name('supplier.values');
+
 

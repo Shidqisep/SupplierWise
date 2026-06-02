@@ -1,0 +1,64 @@
+.material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+body { 
+    font-family: 'Inter', sans-serif; 
+    background-color: #f8f9ff; 
+}
+
+/* Modal */
+.modal-backdrop {
+    display: none;
+    position: fixed; 
+    inset: 0;
+    background: rgba(11,28,48,0.45);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+}
+.modal-backdrop.open { 
+    display: flex; 
+}
+
+/* Toast */
+#toast {
+    position: fixed; 
+    bottom: 2rem; 
+    right: 2rem;
+    transform: translateY(200%);
+    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    z-index: 200;
+}
+#toast.show { 
+    transform: translateY(0); 
+}
+
+/* Hover cards */
+.stat-card {
+    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s ease;
+}
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0,79,53,0.12);
+}
+
+/* Slider */
+.slider-thumb::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: #004f35;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Glass Card */
+.glass-card {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}

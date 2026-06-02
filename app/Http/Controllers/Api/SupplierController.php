@@ -11,7 +11,7 @@ class SupplierController extends Controller
 {
     public function index(): JsonResponse
     {
-        return response()->json(Supplier::orderBy('id')->get());
+        return response()->json(Supplier::with('category')->orderBy('id')->get());
     }
 
     public function store(Request $request): JsonResponse
@@ -20,15 +20,18 @@ class SupplierController extends Controller
             'supplier_name' => 'required|string|max:255',
             'contact' => 'nullable|string|max:255',
             'address' => 'nullable|string|max:255',
+            'category_id' => 'nullable|exists:categories,id',
         ]);
 
         $supplier = Supplier::create($data);
+        $supplier->load('category');
 
         return response()->json($supplier, 201);
     }
 
     public function show(Supplier $supplier): JsonResponse
     {
+        $supplier->load('category');
         return response()->json($supplier);
     }
 
@@ -38,9 +41,11 @@ class SupplierController extends Controller
             'supplier_name' => 'required|string|max:255',
             'contact' => 'nullable|string|max:255',
             'address' => 'nullable|string|max:255',
+            'category_id' => 'nullable|exists:categories,id',
         ]);
 
         $supplier->update($data);
+        $supplier->load('category');
 
         return response()->json($supplier);
     }
