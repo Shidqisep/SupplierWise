@@ -1,29 +1,40 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Profile') }}
-        </h2>
-    </x-slot>
+@extends('layouts.app')
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    <livewire:profile.update-profile-information-form />
-                </div>
-            </div>
+@section('content')
+<div class="max-w-3xl mx-auto space-y-6">
 
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    <livewire:profile.update-password-form />
-                </div>
-            </div>
-
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    <livewire:profile.delete-user-form />
-                </div>
-            </div>
+    {{-- Page Title --}}
+    <div class="flex items-center justify-between mb-lg">
+        <div>
+            <h1 class="font-display-lg text-display-lg text-primary">Profile</h1>
+            <p class="font-body-md text-body-md text-secondary mt-xs">Manage your account information and security settings.</p>
         </div>
+
+        {{-- Logout Button --}}
+        <form method="POST" action="{{ route('logout') }}">
+            @csrf
+            <button type="submit"
+                class="flex items-center gap-sm px-lg py-md rounded-DEFAULT border border-error text-error hover:bg-error-container transition-colors font-label-md">
+                <span class="material-symbols-outlined text-[18px]">logout</span>
+                Logout
+            </button>
+        </form>
     </div>
-</x-app-layout>
+
+    {{-- Update Profile Info (Breeze Volt form) --}}
+    <div class="bg-surface-container-lowest border border-outline-subtle rounded-DEFAULT shadow-[0_4px_20px_rgba(15,23,42,0.04)] p-lg">
+        <livewire:profile.update-profile-information-form />
+    </div>
+
+    {{-- Update Password (Breeze Volt form) --}}
+    <div class="bg-surface-container-lowest border border-outline-subtle rounded-DEFAULT shadow-[0_4px_20px_rgba(15,23,42,0.04)] p-lg">
+        <livewire:profile.update-password-form />
+    </div>
+
+    {{-- Delete Account (Breeze Volt form) --}}
+    <div class="bg-surface-container-lowest border border-outline-subtle rounded-DEFAULT shadow-[0_4px_20px_rgba(15,23,42,0.04)] p-lg">
+        <livewire:profile.delete-user-form />
+    </div>
+
+</div>
+@endsection
