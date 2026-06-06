@@ -1,21 +1,43 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\GoogleController;
+use App\Livewire\AdminDashboard;
 
-Route::view('/dashboard', 'dashboard')
-    ->name('dashboard');
+// Halaman utama (opsional, biasanya diarahkan ke login atau halaman landing)
+Route::redirect('/', '/login');
 
-Route::view('/suppliers', 'suppliers')
-    ->name('suppliers');
+// ==========================================
+// RUTE GOOGLE OAUTH (Bebas diakses tanpa login)
+// ==========================================
+Route::get('auth/google', [GoogleController::class, 'redirectToGoogle'])->name('google.login');
+Route::get('auth/google/callback', [GoogleController::class, 'handleGoogleCallback']);
 
-Route::view('/criteria', 'criteria')
-    ->name('criteria');
+// ==========================================
+// RUTE APLIKASI (Hanya bisa diakses jika sudah login)
+// ==========================================
+Route::middleware(['auth'])->group(function () {
+    
+    Route::get('/dashboard', AdminDashboard::class)
+        ->name('dashboard');
 
-Route::view('/results', 'results')
-    ->name('results');
+    Route::view('/suppliers', 'suppliers')
+        ->name('suppliers');
 
-Route::get('/suppliers/{id}/values', function ($id) {
-    return view('supplier-values', ['supplierId' => (int) $id]);
-})->name('supplier.values');
+    Route::view('/criteria', 'criteria')
+        ->name('criteria');
 
+    Route::view('/results', 'results')
+        ->name('results');
 
+    Route::view('/profile', 'profile')
+        ->name('profile');
+
+    Route::get('/suppliers/{id}/values', function ($id) {
+        return view('supplier-values', ['supplierId' => (int) $id]);
+    })->name('supplier.values');
+
+});
+
+// Memuat rute-rute login/register bawaan dari Laravel Breeze
+require __DIR__.'/auth.php';

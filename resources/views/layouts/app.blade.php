@@ -9,8 +9,9 @@
     <x-topbar />
 
     <main class="ml-64 pt-24 px-8 pb-8">
-    @yield('content')
-</main>
+        @yield('content')
+        {{ $slot ?? '' }}
+    </main>
 
     @include('layouts.modals')
 
