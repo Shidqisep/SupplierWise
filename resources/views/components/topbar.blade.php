@@ -14,11 +14,11 @@
             <span class="material-symbols-outlined">notifications</span>
             <span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
         </button> -->
-        <div class="flex items-center gap-sm ml-sm cursor-pointer hover:bg-surface-container-low p-xs rounded-lg transition-colors">
+        <a href="{{ route('profile') }}" class="flex items-center gap-sm ml-sm hover:bg-surface-container-low p-xs rounded-lg transition-colors">
             <div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-primary font-bold text-sm">
                 {{ strtoupper(substr(auth()->user()->name ?? 'A', 0, 1)) }}
             </div>
             <span class="font-label-md text-label-md text-on-surface">{{ auth()->user()->name ?? 'Admin' }}</span>
-        </div>
+        </a>
     </div>
 </header>
