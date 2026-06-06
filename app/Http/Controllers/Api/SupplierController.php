@@ -9,9 +9,23 @@ use Illuminate\Http\Request;
 
 class SupplierController extends Controller
 {
-    public function index(): JsonResponse
+    /**
+     * Menampilkan daftar supplier.
+     * Mendukung filter opsional berdasarkan category_id via query parameter.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function index(Request $request): JsonResponse
     {
-        return response()->json(Supplier::with('category')->orderBy('id')->get());
+        $query = Supplier::with('category')->orderBy('id');
+
+        // Filter berdasarkan kategori jika parameter diberikan
+        if ($request->has('category_id')) {
+            $query->where('category_id', $request->query('category_id'));
+        }
+
+        return response()->json($query->get());
     }
 
     public function store(Request $request): JsonResponse
