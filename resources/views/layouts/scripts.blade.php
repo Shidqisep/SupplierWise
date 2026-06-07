@@ -558,9 +558,6 @@ function renderRanking() {
 }
 
 function computeAndRenderDashboard() {
-
-    if (!suppliers.length || !criteria.length || !values.length) return;
-
     const bestName  = document.getElementById('best-supplier-name');
     const bestDesc  = document.getElementById('best-supplier-desc');
     const bestScore = document.getElementById('best-supplier-score');
@@ -572,9 +569,24 @@ function computeAndRenderDashboard() {
         return;
     }
 
+    if (!suppliers.length || !criteria.length || !values.length) {
+        bestName.textContent = "Belum Ada Data";
+        bestDesc.textContent = "Tambahkan data supplier, kriteria, dan nilai untuk melihat hasil ranking terbaik di sini.";
+        bestScore.textContent = "0";
+        bestTotal.innerHTML = `<span class="material-symbols-outlined">trending_up</span>0`;
+        const placeholder = document.getElementById('dash-chart-placeholder');
+        if (placeholder) {
+            placeholder.textContent = "Belum cukup data untuk menampilkan chart.";
+        }
+        return;
+    }
+
     const ranking = computeRanking();
 
-    if (!ranking.length) return;
+    if (!ranking.length) {
+        bestName.textContent = "Belum Ada Data";
+        return;
+    }
 
     const best = ranking[0];
 

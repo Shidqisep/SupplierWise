@@ -12,5 +12,9 @@ Route::apiResource('criteria', CriteriaController::class);
 Route::apiResource('suppliers', SupplierController::class);
 Route::apiResource('supplier-values', SupplierValueController::class);
 
+Route::post('/register', [\App\Http\Controllers\Api\AuthController::class, 'register']);
+Route::post('/login', [\App\Http\Controllers\Api\AuthController::class, 'login']);
+Route::middleware('auth:sanctum')->post('/logout', [\App\Http\Controllers\Api\AuthController::class, 'logout']);
+
 // Endpoint perhitungan COPRAS — GET /api/results?category_id={id}
 Route::get('results', [ResultController::class, 'calculate']);
