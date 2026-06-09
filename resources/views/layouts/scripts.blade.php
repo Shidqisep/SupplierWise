@@ -90,7 +90,7 @@ async function loadSuppliers() {
     renderSupplierTable();
     updateDashCounts();
     populateValueDropdowns();
-    computeAndRenderDashboard();
+    // computeAndRenderDashboard();
 }
 
 function renderSupplierTable() {
@@ -181,7 +181,7 @@ async function loadCriteria() {
     renderCriteriaTable();
     updateDashCounts();
     populateValueDropdowns();
-    computeAndRenderDashboard();
+    // computeAndRenderDashboard();
 }
 
 function renderCriteriaTable() {
@@ -495,36 +495,81 @@ function updateDashStats() {
 function computeRanking() {
     if (!suppliers.length || !criteria.length || !values.length) return [];
 
-    // Build score map: { supplierId: { criteriaId: score } }
+    // Build score map
     const scoreMap = {};
     values.forEach(v => {
         if (!scoreMap[v.id_supplier]) scoreMap[v.id_supplier] = {};
         scoreMap[v.id_supplier][v.id_criteria] = parseFloat(v.score);
     });
 
-    // Find min/max per criteria for normalization
-    const minMax = {};
+    // Step 1: Column sums untuk normalisasi
+    const colSums = {};
     criteria.forEach(c => {
-        const vals = values.filter(v => v.id_criteria == c.id).map(v => parseFloat(v.score));
-        minMax[c.id] = { min: Math.min(...vals), max: Math.max(...vals) };
+        colSums[c.id] = suppliers.reduce((sum, s) => {
+            return sum + (scoreMap[s.id]?.[c.id] ?? 0);
+        }, 0);
     });
 
-    // Compute weighted score per supplier
-    const ranking = suppliers.map(s => {
-        let total = 0;
+    // Step 2: Normalized matrix
+    const normalized = {};
+    suppliers.forEach(s => {
+        normalized[s.id] = {};
         criteria.forEach(c => {
-            const raw = scoreMap[s.id]?.[c.id];
-            if (raw === undefined) return;
-            const { min, max } = minMax[c.id];
-            let norm = (max === min) ? 1 : (c.type === 'benefit')
-                ? (raw - min) / (max - min)
-                : (max - raw) / (max - min);
-            total += norm * parseFloat(c.weight);
+            const val = scoreMap[s.id]?.[c.id] ?? 0;
+            normalized[s.id][c.id] = colSums[c.id] > 0 ? val / colSums[c.id] : 0;
         });
-        return { supplier: s, total: total };
     });
 
-    return ranking.sort((a, b) => b.total - a.total);
+    // Step 3: Weighted normalized (bobot sudah desimal 0-1, langsung pakai)
+    const totalWeight = criteria.reduce((sum, c) => sum + parseFloat(c.weight), 0);
+    const weighted = {};
+    suppliers.forEach(s => {
+        weighted[s.id] = {};
+        criteria.forEach(c => {
+            const wNorm = totalWeight > 0 ? parseFloat(c.weight) / totalWeight : 0;
+            weighted[s.id][c.id] = normalized[s.id][c.id] * wNorm;
+        });
+    });
+
+    // Step 4 & 5: S+ (benefit) dan S- (cost)
+    const sPlus = {}, sMinus = {};
+    suppliers.forEach(s => {
+        let sp = 0, sm = 0;
+        criteria.forEach(c => {
+            const d = weighted[s.id][c.id];
+            if (c.type === 'benefit') sp += d;
+            else sm += d;
+        });
+        sPlus[s.id] = sp;
+        sMinus[s.id] = sm;
+    });
+
+    // Step 6: Relative significance Q
+    const sumSMinus = Object.values(sMinus).reduce((a, b) => a + b, 0);
+    const sumInvSMinus = Object.values(sMinus).reduce((sum, sm) => {
+        return sum + (sm > 0 ? 1 / sm : 0);
+    }, 0);
+
+    const q = {};
+    suppliers.forEach(s => {
+        const sid = s.id;
+        if (sMinus[sid] > 0 && sumInvSMinus > 0) {
+            q[sid] = sPlus[sid] + (sumSMinus / (sMinus[sid] * sumInvSMinus));
+        } else {
+            q[sid] = sPlus[sid];
+        }
+    });
+
+    // Step 7: Utility degree (0-100)
+    const qMax = Math.max(...Object.values(q)) || 1;
+    const ranking = suppliers.map(s => ({
+        supplier: s,
+        q: q[s.id],
+        total: q[s.id] / qMax,  // 0-1 untuk chart bar height
+        utility: (q[s.id] / qMax) * 100
+    }));
+
+    return ranking.sort((a, b) => b.utility - a.utility);
 }
 
 function renderRanking() {
@@ -595,7 +640,7 @@ function computeAndRenderDashboard() {
     bestDesc.textContent =
         `Performa tertinggi berdasarkan ${criteria.length} kriteria yang aktif. Total weighted score terbaik dari ${suppliers.length} supplier yang ada.`;
 
-    const score = (best.total * 100).toFixed(1);
+    const score = best.utility.toFixed(1);
 
     bestScore.textContent = score;
 
@@ -608,7 +653,8 @@ function computeAndRenderDashboard() {
         placeholder.remove();
     }
 
-    const top = ranking.slice(0, 7);
+    //top 5
+    const top = ranking.slice(0, 5);
     const maxVal = top[0]?.total || 1;
 
     chart.querySelectorAll('.chart-bar-col').forEach(el => el.remove());
@@ -625,24 +671,24 @@ function computeAndRenderDashboard() {
         col.className =
             'chart-bar-col flex-1 flex flex-col justify-end group';
 
-        col.innerHTML = `
-            <div
-                class="bg-primary-fixed w-full rounded-t-sm group-hover:bg-primary transition-colors relative"
-                style="height:${heightPct}%">
+        const heightPx = Math.max(10, Math.round(r.total / maxVal * 200));
 
-                <div
-                    class="absolute -top-10 left-1/2 -translate-x-1/2 bg-on-surface text-surface px-sm py-xs rounded text-[10px] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                    ${(r.total * 100).toFixed(1)}%
+        col.innerHTML = `
+                <div class="relative w-full rounded-t-sm transition-colors group-hover:opacity-80"
+                    style="height:${heightPx}px; background-color: var(--color-primary, #1a6b45);">
+
+                    <div class="absolute -top-8 left-1/2 -translate-x-1/2 px-1 py-0.5 rounded text-white opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap"
+                        style="font-size:10px; background-color: #333;">
+                        ${r.utility.toFixed(1)}%
+                    </div>
+
                 </div>
 
-            </div>
-
-            <p
-                class="text-center font-label-md text-label-md text-secondary mt-sm truncate max-w-full px-xs"
-                style="font-size:10px">
-                ${esc(r.supplier.supplier_name.split(' ')[0])}
-            </p>
-        `;
+                <p class="text-center text-secondary mt-1 truncate w-full px-1"
+                style="font-size:10px;">
+                    ${esc(r.supplier.supplier_name.split(' ')[0])}
+                </p>
+            `;
 
         chart.appendChild(col);
     });

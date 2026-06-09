@@ -114,7 +114,7 @@
                         </div>
 
                         {{-- Bar chart: top suppliers by total weighted score --}}
-                        <div class="h-64 w-full relative flex items-end gap-gutter mt-xl px-md" id="dash-chart">
+                        <div class="h-64 w-full relative flex items-end gap-gutter mt-xl px-md" id="dash-chart" style="height: 256px;">
                             <div class="absolute inset-0 flex flex-col justify-between opacity-10 pointer-events-none">
                                 <div class="border-t border-on-surface w-full"></div>
                                 <div class="border-t border-on-surface w-full"></div>
