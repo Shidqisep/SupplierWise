@@ -10,7 +10,7 @@ const API = {
     values:     '{{ url("/api/supplier-values") }}',
 };
 const CSRF = document.querySelector('meta[name="csrf-token"]').content;
-const headers = { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF };
+const headers = { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF };
 
 // ─── State ────────────────────────────────────────────────────────────────────
 let categories = [], suppliers = [], criteria = [], values = [];
@@ -41,7 +41,7 @@ document.querySelectorAll('.modal-backdrop').forEach(m => {
 
 // ─── API Helpers ──────────────────────────────────────────────────────────────
 async function apiFetch(url, options = {}) {
-    const res = await fetch(url, { headers, ...options });
+    const res = await fetch(url, {credentials: 'same-origin', headers, ...options });
     if (!res.ok) {
         const err = await res.json().catch(() => ({}));
         throw new Error(err.message || 'Request gagal');

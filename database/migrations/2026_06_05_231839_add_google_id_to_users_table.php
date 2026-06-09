@@ -19,9 +19,9 @@ return new class extends Migration
 
     public function down()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('google_id');
-            $table->string('password')->nullable(false)->change();
-        });
+        // Schema::table('users', function (Blueprint $table) {
+        //     $table->dropColumn('google_id');
+        //     $table->string('password')->nullable(false)->change();
+        // });
     }
 };

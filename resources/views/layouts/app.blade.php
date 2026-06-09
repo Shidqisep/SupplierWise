@@ -1,6 +1,7 @@
 <html class="light" lang="id">
 <head>
     @include('layouts.head')
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
 <body class="bg-surface text-on-surface">
