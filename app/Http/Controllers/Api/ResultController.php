@@ -19,27 +19,51 @@ class ResultController extends Controller
      * - category_id (required): ID kategori supplier yang akan dievaluasi
      * - search (optional): Filter nama supplier berdasarkan keyword
      *
+     * Hanya memproses data milik user yang sedang login.
+     *
      * @param Request $request
      * @return JsonResponse
      */
     public function calculate(Request $request): JsonResponse
     {
+        $userId = $request->user()->id;
+
         $request->validate([
-            'category_id' => 'required|exists:categories,id',
+            'category_id' => [
+                'required',
+                'exists:categories,id',
+                // Pastikan kategori ini milik user yang sedang login
+                function ($attribute, $value, $fail) use ($userId) {
+                    $category = Category::where('id', $value)
+                        ->where('user_id', $userId)
+                        ->first();
+                    if (! $category) {
+                        $fail('Kategori tidak ditemukan atau bukan milik Anda.');
+                    }
+                },
+            ],
             'search' => 'nullable|string|max:255',
         ]);
 
         $categoryId = $request->query('category_id');
         $search = $request->query('search', '');
 
-        $suppliers = Supplier::where('category_id', $categoryId)->orderBy('id')->get();
-        $criterias = Criteria::orderBy('id')->get();
+        // Hanya ambil data milik user yang sedang login
+        $suppliers = Supplier::where('category_id', $categoryId)
+            ->where('user_id', $userId)
+            ->orderBy('id')
+            ->get();
+
+        $criterias = Criteria::where('user_id', $userId)
+            ->orderBy('id')
+            ->get();
+
         $supplierValues = Supplier_Value::whereIn('id_supplier', $suppliers->pluck('id'))->get();
 
         // Jika data tidak lengkap, kembalikan response kosong
         if ($suppliers->isEmpty() || $criterias->isEmpty() || $supplierValues->isEmpty()) {
             return response()->json([
-                'category' => Category::find($categoryId),
+                'category' => Category::where('id', $categoryId)->where('user_id', $userId)->first(),
                 'rankings' => [],
                 'criterias' => $criterias,
                 'supplier_count' => $suppliers->count(),
@@ -172,7 +196,7 @@ class ResultController extends Controller
         }
 
         return response()->json([
-            'category' => Category::find($categoryId),
+            'category' => Category::where('id', $categoryId)->where('user_id', $userId)->first(),
             'rankings' => $rankings,
             'criterias' => $criterias,
             'supplier_count' => $suppliers->count(),

@@ -669,6 +669,7 @@ if (featuredCard) {
 }
 
 // ─── Init ─────────────────────────────────────────────────────────────────────
+@auth
 (async function init() {
     try {
         await loadCategories();
@@ -678,4 +679,5 @@ if (featuredCard) {
         showToast('Gagal memuat data: ' + e.message, 'error');
     }
 })();
+@endauth
 </script>

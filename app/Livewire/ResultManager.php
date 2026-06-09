@@ -14,7 +14,9 @@ class ResultManager extends Component
 
     public function mount()
     {
-        $firstCategory = \App\Models\Category::orderBy('category_name')->first();
+        $firstCategory = \App\Models\Category::where('user_id', auth()->id())
+            ->orderBy('category_name')
+            ->first();
         if ($firstCategory) {
             $this->selectedCategory = (string) $firstCategory->id;
         }
@@ -44,8 +46,13 @@ class ResultManager extends Component
             ];
         }
 
-        $suppliers = Supplier::where('category_id', $this->selectedCategory)->orderBy('id')->get();
-        $criterias = Criteria::orderBy('id')->get();
+        $suppliers = Supplier::where('category_id', $this->selectedCategory)
+            ->where('user_id', auth()->id())
+            ->orderBy('id')
+            ->get();
+        $criterias = Criteria::where('user_id', auth()->id())
+            ->orderBy('id')
+            ->get();
         $supplierValues = Supplier_Value::whereIn('id_supplier', $suppliers->pluck('id'))->get();
 
         if ($suppliers->isEmpty() || $criterias->isEmpty() || $supplierValues->isEmpty()) {
@@ -196,7 +203,7 @@ class ResultManager extends Component
             'criterias'     => $result['criterias'],
             'supplierCount' => $result['suppliers']->count(),
             'totalWeight'   => $result['totalWeight'],
-            'categoriesList' => \App\Models\Category::orderBy('category_name')->get(),
+            'categoriesList' => \App\Models\Category::where('user_id', auth()->id())->orderBy('category_name')->get(),
         ]);
     }
 }
