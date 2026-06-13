@@ -54,6 +54,16 @@
     <span class="material-symbols-outlined">analytics</span>
     <span class="font-label-md text-label-md">Results</span>
 </a>
+            @if(auth()->check() && auth()->user()->is_admin == 1)
+            <a href="{{ route('security') }}"
+   class="flex items-center gap-md px-md py-sm rounded-DEFAULT transition-all duration-200
+   {{ $current == 'security'
+        ? 'bg-primary text-on-primary'
+        : 'text-secondary hover:bg-surface-container-high' }}">
+    <span class="material-symbols-outlined">shield</span>
+    <span class="font-label-md text-label-md">Security</span>
+</a>
+            @endif
         </nav>
 
         <!-- {{-- Bottom nav --}}

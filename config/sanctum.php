@@ -50,7 +50,7 @@ return [
     |
     */
 
-    'expiration' => null,
+    'expiration' => 1440, // Token kedaluwarsa setelah 24 jam (1440 menit)
 
     /*
     |--------------------------------------------------------------------------

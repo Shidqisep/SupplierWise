@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Forms;
 
+use App\Models\SecurityAuditLog;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
@@ -33,12 +34,20 @@ class LoginForm extends Form
         if (! Auth::attempt($this->only(['email', 'password']), $this->remember)) {
             RateLimiter::hit($this->throttleKey());
 
+            // Log login gagal
+            SecurityAuditLog::logEvent('login_failed', null, request(),
+                'Login web gagal untuk: ' . $this->email);
+
             throw ValidationException::withMessages([
                 'form.email' => trans('auth.failed'),
             ]);
         }
 
         RateLimiter::clear($this->throttleKey());
+
+        // Log login berhasil
+        SecurityAuditLog::logEvent('login_success', Auth::id(), request(),
+            'Login web berhasil untuk: ' . $this->email);
     }
 
     /**
@@ -53,6 +62,10 @@ class LoginForm extends Form
         event(new Lockout(request()));
 
         $seconds = RateLimiter::availableIn($this->throttleKey());
+
+        // Log rate limit
+        SecurityAuditLog::logEvent('login_rate_limited', null, request(),
+            'Web login rate limit tercapai untuk: ' . $this->email);
 
         throw ValidationException::withMessages([
             'form.email' => trans('auth.throttle', [
@@ -70,3 +83,4 @@ class LoginForm extends Form
         return Str::transliterate(Str::lower($this->email).'|'.request()->ip());
     }
 }
+

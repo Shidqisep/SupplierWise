@@ -37,6 +37,13 @@ Route::middleware(['auth'])->group(function () {
         return view('supplier-values', ['supplierId' => (int) $id]);
     })->name('supplier.values');
 
+    // =====================================================
+    // SECURITY DASHBOARD — Hanya untuk Admin
+    // =====================================================
+    Route::get('/security', \App\Livewire\SecurityDashboard::class)
+        ->middleware('admin')
+        ->name('security');
+
 });
 
 // Memuat rute-rute login/register bawaan dari Laravel Breeze
