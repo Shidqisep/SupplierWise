@@ -52,6 +52,7 @@ class SecurityHeadersMiddleware
 
         $response->headers->set($cspHeader,
             "default-src 'self'; " .
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://accounts.google.com https://cdn.tailwindcss.com; " .
             "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://accounts.google.com; " .
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.bunny.net https://cdn.jsdelivr.net; " .
             "font-src 'self' https://fonts.gstatic.com https://fonts.bunny.net; " .
