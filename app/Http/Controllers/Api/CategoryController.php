@@ -9,9 +9,13 @@ use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        return response()->json(Category::orderBy('category_name')->get());
+        $categories = Category::where('user_id', $request->user()->id)
+            ->orderBy('category_name')
+            ->get();
+
+        return response()->json($categories);
     }
 
     public function store(Request $request): JsonResponse
@@ -20,13 +24,18 @@ class CategoryController extends Controller
             'category_name' => 'required|string|max:255',
         ]);
 
+        $data['user_id'] = $request->user()->id;
         $category = Category::create($data);
 
         return response()->json($category, 201);
     }
 
-    public function destroy(Category $category): JsonResponse
+    public function destroy(Request $request, Category $category): JsonResponse
     {
+        if ($category->user_id !== $request->user()->id) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
         $category->delete();
 
         return response()->json(null, 204);

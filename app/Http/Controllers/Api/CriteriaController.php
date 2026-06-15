@@ -9,9 +9,13 @@ use Illuminate\Http\Request;
 
 class CriteriaController extends Controller
 {
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        return response()->json(Criteria::orderBy('id')->get());
+        $criterias = Criteria::where('user_id', $request->user()->id)
+            ->orderBy('id')
+            ->get();
+
+        return response()->json($criterias);
     }
 
     public function store(Request $request): JsonResponse
@@ -22,18 +26,27 @@ class CriteriaController extends Controller
             'weight' => 'required|numeric|min:0',
         ]);
 
+        $data['user_id'] = $request->user()->id;
         $criteria = Criteria::create($data);
 
         return response()->json($criteria, 201);
     }
 
-    public function show(Criteria $criterion): JsonResponse
+    public function show(Request $request, Criteria $criterion): JsonResponse
     {
+        if ($criterion->user_id !== $request->user()->id) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
         return response()->json($criterion);
     }
 
     public function update(Request $request, Criteria $criterion): JsonResponse
     {
+        if ($criterion->user_id !== $request->user()->id) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
         $data = $request->validate([
             'criteria_name' => 'required|string|max:255',
             'type' => 'required|in:benefit,cost',
@@ -45,8 +58,12 @@ class CriteriaController extends Controller
         return response()->json($criterion);
     }
 
-    public function destroy(Criteria $criterion): JsonResponse
+    public function destroy(Request $request, Criteria $criterion): JsonResponse
     {
+        if ($criterion->user_id !== $request->user()->id) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
         $criterion->delete();
 
         return response()->json(null, 204);
